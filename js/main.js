@@ -280,7 +280,7 @@ function safeCfg() {
     delivery: c.delivery || 'api',
     ownerEmail: c.ownerEmail || 'kumarakash030528@gmail.com',
     apiURL: typeof c.apiURL === 'string' ? c.apiURL.trim() : '',
-    apiBase: typeof c.apiBase === 'string' ? c.apiBase.trim() : 'http://localhost:3001'
+    apiBase: typeof c.apiBase === 'string' ? c.apiBase.trim() : 'https://all-in-one-financial.onrender.com'
   };
 }
 
@@ -492,7 +492,7 @@ function initContactHub() {
     const apiURL = resolveApiUrl(cfg);
 
     if (window.location.protocol === 'file:') {
-      console.warn('[FinBiz] Open http://localhost:3001 — file:// cannot reach the API.');
+      console.warn('[FinBiz] Open https://all-in-one-financial.onrender.com — file:// cannot reach the API.');
     }
 
     console.log('[FinBiz] POST', apiURL);
