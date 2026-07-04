@@ -286,7 +286,7 @@ function safeCfg() {
 
 function resolveApiUrl(cfg) {
   if (cfg.apiURL) return cfg.apiURL;
-  const apiBase = (cfg.apiBase || 'http://localhost:3001').replace(/\/$/, '');
+  const apiBase = (cfg.apiBase || 'https://all-in-one-financial.onrender.com').replace(/\/$/, '');
   const { protocol, hostname, port } = window.location;
   const onApiServer =
     port === '3001' || (protocol !== 'file:' && !port && hostname === 'localhost');
