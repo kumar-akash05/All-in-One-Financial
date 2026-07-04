@@ -17,6 +17,7 @@ function getEmailCredentials() {
 
 function buildTransporter() {
   const { user, pass } = getEmailCredentials();
+
   if (!user || !pass) {
     configured = false;
     transporter = null;
@@ -27,8 +28,15 @@ function buildTransporter() {
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: Number(process.env.SMTP_PORT) || 587,
     secure: String(process.env.SMTP_SECURE) === 'true',
-    auth: { user, pass },
-    tls: { rejectUnauthorized: true }
+
+    auth: {
+      user,
+      pass
+    },
+
+    tls: {
+      rejectUnauthorized: false
+    }
   });
 
   configured = true;
@@ -37,15 +45,17 @@ function buildTransporter() {
 
 async function verifyMailer() {
   const t = buildTransporter();
+
   if (!t) {
     console.warn(
-      '[finbiz-mail] EMAIL_USER / EMAIL_PASS not set — copy server/.env.example to server/.env and add Gmail App Password.'
+      '[finbiz-mail] EMAIL_USER / EMAIL_PASS not set'
     );
     return false;
   }
+
   try {
     await t.verify();
-    console.log('[finbiz-mail] Gmail SMTP ready →', getEmailCredentials().user);
+    console.log('[finbiz-mail] SMTP ready →', getEmailCredentials().user);
     return true;
   } catch (err) {
     configured = false;
@@ -61,6 +71,7 @@ function isMailConfigured() {
 
 function getFromAddress() {
   const { user } = getEmailCredentials();
+
   return (
     process.env.EMAIL_FROM ||
     process.env.SMTP_FROM ||
@@ -72,17 +83,18 @@ async function sendInquiryEmails({ ownerEmail, inquiry }) {
   if (!transporter || !configured) {
     buildTransporter();
   }
+
   if (!transporter) {
     throw new Error(
-      'Email service is not configured. Add EMAIL_USER and EMAIL_PASS to server/.env (Gmail App Password).'
+      'Email service not configured. Set EMAIL_USER and EMAIL_PASS in .env'
     );
   }
 
   const from = getFromAddress();
-  const adminSubject = '🚀 New Project Inquiry Received';
-  const customerSubject = '✓ our Request Has Been Sent Successfully | FinBiz Solutions';
 
-  console.log('[finbiz-mail] Sending admin notification →', ownerEmail);
+  const adminSubject = '🚀 New Project Inquiry Received';
+  const customerSubject = '✓ Your Request Has Been Sent Successfully | FinBiz Solutions';
+
   const adminResult = await transporter.sendMail({
     from,
     to: ownerEmail,
@@ -91,9 +103,7 @@ async function sendInquiryEmails({ ownerEmail, inquiry }) {
     text: adminInquiryText(inquiry),
     html: adminInquiryEmail(inquiry)
   });
-  console.log('[finbiz-mail] Admin email sent:', adminResult.messageId);
 
-  console.log('[finbiz-mail] Sending customer confirmation →', inquiry.email);
   const customerResult = await transporter.sendMail({
     from,
     to: inquiry.email,
@@ -101,7 +111,6 @@ async function sendInquiryEmails({ ownerEmail, inquiry }) {
     text: customerConfirmationText(inquiry),
     html: customerConfirmationEmail(inquiry)
   });
-  console.log('[finbiz-mail] Customer email sent:', customerResult.messageId);
 
   return {
     adminMessageId: adminResult.messageId,
