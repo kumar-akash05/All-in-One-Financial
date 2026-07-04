@@ -278,7 +278,7 @@ function safeCfg() {
       : {};
   return {
     delivery: c.delivery || 'api',
-    ownerEmail: c.ownerEmail || 'kumarakash030528@gmail.com',
+    ownerEmail: c.ownerEmail || 'deepakjha0012@gmail.com',
     apiURL: typeof c.apiURL === 'string' ? c.apiURL.trim() : '',
     apiBase: typeof c.apiBase === 'string' ? c.apiBase.trim() : 'https://all-in-one-financial.onrender.com'
   };
@@ -335,9 +335,9 @@ function initContactHub() {
 
   let currentStep = 1;
   let mailDeliveryReady = false;
-
-  async function checkMailDeliveryStatus() {
+async function checkMailDeliveryStatus() {
     const statusUrl = resolveApiUrl(safeCfg()).replace(/\/contact$/, '/contact/status');
+    console.log('[FinBiz] Status URL:', statusUrl);
     try {
       const res = await fetch(statusUrl, { headers: { Accept: 'application/json' } });
       if (!res.ok) {
@@ -375,6 +375,7 @@ function initContactHub() {
   }
 
   checkMailDeliveryStatus();
+
 
   const todayISO = () => new Date().toISOString().split('T')[0];
   if (dl) dl.min = todayISO();
