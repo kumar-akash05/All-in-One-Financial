@@ -6,12 +6,22 @@
  *   EMAIL_PASS=your_gmail_app_password
  *   OWNER_EMAIL=kumarakash030528@gmail.com
  */
-
 require('dotenv').config();
+
+const express = require('express');
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
 
 const fs = require('fs/promises');
 const path = require('path');
-const express = require('express');
+//const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -254,6 +264,9 @@ app.use(express.static(WEBSITE_ROOT));
 
 async function start() {
   const mailOk = await verifyMailer();
+
+  console.log("EMAIL_USER:", process.env.EMAIL_USER);
+  console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
 
   app.listen(PORT, () => {
     console.log(`[finbiz] Website + API: http://localhost:${PORT}`);
