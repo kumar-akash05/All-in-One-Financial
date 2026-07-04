@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Form Leads</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 1.5rem; background: #0f172a; color: #e2e8f0; }
+    h1 { font-size: 1.5rem; }
+    .meta { color: #94a3b8; margin-bottom: 1.5rem; }
+  a { color: #60a5fa; }
+    .lead { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
+    .lead h3 { margin: 0 0 0.5rem; color: #f8fafc; }
+    .lead p { margin: 0.25rem 0; font-size: 0.9rem; }
+    .err { color: #fca5a5; }
+  </style>
+</head>
+<body>
+  <h1>Saved form requests</h1>
+  <p class="meta">Local backup from <code>server/data/inquiries.json</code> · Server must be running on port 3001</p>
+  <p><a href="index.html">← Website</a> · <a href="email-setup.html">Email setup</a></p>
+  <div id="list">Loading…</div>
+  <script>
+    fetch('/api/inquiries')
+      .then((r) => r.json())
+      .then((data) => {
+        const el = document.getElementById('list');
+        if (!data.ok || !data.inquiries?.length) {
+          el.innerHTML = '<p class="err">No leads yet, or server is not running. Start: <code>cd server && npm start</code></p>';
+          return;
+        }
+        el.innerHTML = data.inquiries
+          .slice()
+          .reverse()
+          .map(
+            (q) => `
+          <article class="lead">
+            <h3>${q.fullName} · ${q.serviceTypeLabel || q.serviceType}</h3>
+            <p><strong>Email:</strong> ${q.email} · <strong>Phone:</strong> ${q.phone}</p>
+            <p><strong>Budget:</strong> ${q.budgetLabel || q.budgetRange} · <strong>Deadline:</strong> ${q.deadline || '—'}</p>
+            <p><strong>Message:</strong> ${q.message}</p>
+            <p style="color:#64748b;font-size:0.8rem">${q.storedAt || q.receivedAt}</p>
+          </article>`
+          )
+          .join('');
+      })
+      .catch(() => {
+        document.getElementById('list').innerHTML =
+          '<p class="err">Cannot reach API. Run <code>npm start</code> in the <code>server</code> folder, then open <code>http://localhost:3001</code></p>';
+      });
+  </script>
+</body>
+</html>

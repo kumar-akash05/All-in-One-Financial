@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gmail SMTP Setup — FinBiz Admin</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.65; color: #0f172a; }
+    h1 { color: #2563eb; font-size: 1.45rem; }
+    code, pre { background: #f1f5f9; border-radius: 8px; font-size: 0.88em; }
+    pre { padding: 1rem; overflow-x: auto; }
+    .box { background: #eff6ff; border: 1px solid #bfdbfe; padding: 1.25rem; border-radius: 12px; margin: 1.25rem 0; }
+    ol { padding-left: 1.2rem; }
+    a { color: #2563eb; }
+  </style>
+</head>
+<body>
+  <h1>Enable email delivery (Gmail + Nodemailer)</h1>
+  <p>Leads are sent from the <strong>Node.js backend</strong> to <strong>kumarakash030528@gmail.com</strong>. The contact form shows success <em>only</em> after both admin and customer emails are sent.</p>
+
+  <div class="box">
+    <h2 style="margin-top:0">Step 1 — Gmail App Password</h2>
+    <ol>
+      <li>Open <a href="https://myaccount.google.com/security" target="_blank" rel="noopener">Google Account Security</a></li>
+      <li>Turn on <strong>2-Step Verification</strong></li>
+      <li>Search <strong>App passwords</strong> → create one for “Mail”</li>
+      <li>Copy the 16-character password</li>
+    </ol>
+  </div>
+
+  <div class="box">
+    <h2 style="margin-top:0">Step 2 — Save password (easiest on Windows)</h2>
+    <p>In PowerShell:</p>
+    <pre>cd server
+.\setup-email.ps1</pre>
+    <p>It will ask for your Gmail App Password and save <code>server/.env</code> automatically.</p>
+    <p><strong>Or</strong> edit <code>server/.env</code> manually — line must look like this (no spaces after <code>=</code>):</p>
+    <pre>EMAIL_PASS=abcdefghijklmnop</pre>
+    <p style="color:#b45309"><strong>Your file currently has EMAIL_PASS empty</strong> if the red banner still shows.</p>
+  </div>
+
+  <div class="box">
+    <h2 style="margin-top:0">Step 3 — Start server</h2>
+    <pre>cd server
+npm install
+npm start</pre>
+    <p>Open <a href="http://localhost:3001">http://localhost:3001</a> and submit the form. Check terminal for <code>[finbiz-mail] Gmail SMTP ready</code>.</p>
+  </div>
+
+  <p><a href="admin-leads.html">View saved leads</a> · <a href="index.html">Back to website</a></p>
+</body>
+</html>

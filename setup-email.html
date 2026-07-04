@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinBiz — Enable admin email</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      margin: 0;
+      padding: 2rem 1.25rem 3rem;
+      line-height: 1.6;
+    }
+    .wrap { max-width: 640px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .sub { color: #94a3b8; margin-bottom: 1.5rem; }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 1.25rem 1.35rem;
+      margin-bottom: 1rem;
+    }
+    .card h2 { font-size: 1rem; margin: 0 0 0.75rem; color: #f8fafc; }
+    ol { margin: 0; padding-left: 1.2rem; }
+    li { margin-bottom: 0.5rem; }
+    a { color: #60a5fa; }
+    code {
+      background: #0f172a;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      margin-bottom: 1.25rem;
+      font-weight: 600;
+    }
+    .status--ok { background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #86efac; }
+    .status--warn { background: rgba(251, 191, 36, 0.12); border: 1px solid #fbbf24; color: #fde68a; }
+    .links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1rem;
+      border-radius: 8px;
+      background: #2563eb;
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .btn--ghost { background: transparent; border: 1px solid #475569; color: #cbd5e1; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1><i class="fas fa-envelope"></i> Enable admin email</h1>
+    <p class="sub">Leads go to <strong>kumarakash030528@gmail.com</strong> when a visitor submits the contact form.</p>
+
+    <div id="status-box" class="status status--warn">
+      <i class="fas fa-spinner fa-spin"></i> Checking configuration…
+    </div>
+
+    <div class="card">
+      <h2>Option A — Web3Forms (2 minutes, recommended)</h2>
+      <ol>
+        <li>Open <a href="https://web3forms.com" target="_blank" rel="noopener">web3forms.com</a></li>
+        <li>Enter <strong>kumarakash030528@gmail.com</strong> and create your Access Key</li>
+        <li>Copy <code>server/.env.example</code> to <code>server/.env</code> if you have not already</li>
+        <li>Paste the key: <code>WEB3FORMS_ACCESS_KEY=your-key-here</code></li>
+        <li>Restart the server: <code>cd server && npm start</code></li>
+        <li>Submit a test on the <a href="/#contact">contact form</a> — check Gmail inbox and spam</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>Option B — Gmail SMTP</h2>
+      <ol>
+        <li>Google Account → Security → 2-Step Verification → App passwords</li>
+        <li>Create an app password for “Mail”</li>
+        <li>In <code>server/.env</code> set <code>SMTP_USER</code>, <code>SMTP_PASS</code> (see <code>.env.example</code>)</li>
+        <li>Restart <code>npm start</code> in the <code>server</code> folder</li>
+      </ol>
+    </div>
+
+    <p>Until email is configured, every submission is still saved — open <a href="admin-leads.html">admin-leads.html</a>.</p>
+
+    <div class="links">
+      <a class="btn" href="/#contact"><i class="fas fa-paper-plane"></i> Test contact form</a>
+      <a class="btn btn--ghost" href="admin-leads.html"><i class="fas fa-list"></i> View saved leads</a>
+      <a class="btn btn--ghost" href="/"><i class="fas fa-home"></i> Website</a>
+    </div>
+  </div>
+  <script>
+    (async function () {
+      const box = document.getElementById('status-box');
+      try {
+        const res = await fetch('/api/email-status');
+        const data = await res.json();
+        if (data.configured) {
+          box.className = 'status status--ok';
+          box.innerHTML =
+            '<i class="fas fa-circle-check"></i> Email is ON (' +
+            data.method +
+            ') → ' +
+            (data.ownerEmail || 'admin') +
+            '. Submit the form to test.';
+        } else {
+          box.className = 'status status--warn';
+          box.innerHTML =
+            '<i class="fas fa-triangle-exclamation"></i> Email is OFF — follow Option A below, then restart the server.';
+        }
+      } catch {
+        box.className = 'status status--warn';
+        box.innerHTML =
+          '<i class="fas fa-triangle-exclamation"></i> Start the server first: <code>cd server && npm start</code>';
+      }
+    })();
+  </script>
+</body>
+</html>
